@@ -2,6 +2,8 @@ TRIS : Telomeric Repeat motif Identification tool with Short-read sequencing
 ================
 TRIS is tool that can identify Telomeric repeat motif (TRM) with short-read sequencing data. This tool looks for repeated sequences in a single read to find candidates for TRMs, iterating through them to finally find a TRM.
 
+[![CI](https://github.com/Chemical118/TRIS/actions/workflows/ci.yaml/badge.svg)](https://github.com/Chemical118/TRIS/actions/workflows/ci.yaml)[![Build](https://github.com/Chemical118/TRIS/actions/workflows/build.yaml/badge.svg)](https://github.com/Chemical118/TRIS/actions/workflows/build.yaml)[![codecov](https://codecov.io/gh/Chemical118/TRIS/graph/badge.svg?token=WRDCVZUAWH)](https://codecov.io/gh/Chemical118/TRIS)
+
 ### Install
 You can download a binary from release or build from source.
 

@@ -15,11 +15,7 @@
 #define K_MER_DATA_MAX_SEQ 2
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define MIN_128(x, y) ({ \
-    uint128_t _a = (x);  \
-    uint128_t _b = (y);  \
-    _a < _b ? _a : _b;   \
-})
+#define MIN_128(x, y) ({uint128_t _a = (x);uint128_t _b = (y);_a < _b ? _a : _b;})
 
 #include <cstdint>
 #include <tuple>

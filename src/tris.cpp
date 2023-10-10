@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#define NOMINMAX
-#endif
-
 #include "kmer.h"
 #include "argparse/argparse.hpp"
 #include <filesystem>

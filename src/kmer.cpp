@@ -785,6 +785,8 @@ void k_mer(const char* seq, int st, int nd, uint32_t** rot_table, const uint64_t
     uint32_t estimated_count;
     uint64_t tmp;
     uint64_t val;
+    uint32_t _a, _b;
+    uint64_t _c;
 
     double target_frequency = 0;
     int target_k;
@@ -859,13 +861,16 @@ void k_mer(const char* seq, int st, int nd, uint32_t** rot_table, const uint64_t
                     for (uint32_t i = 0; i < k_mer_data[k - MIN_MER][K_MER_DATA_COUNT]; i++) {
                         val = k_mer_counter[k - MIN_MER][k_mer_counter_list[k - MIN_MER][i]];
                         if (val > 0) {
-                            (*result)[KmerSeq {k, MIN_128(rot_table[k - MIN_MER][reverse_complement(k_mer_counter_list[k - MIN_MER][i]) >> (2 * (16 - k))], k_mer_counter_list[k - MIN_MER][i])}] += val;
+                            _a = rot_table[k - MIN_MER][reverse_complement(k_mer_counter_list[k - MIN_MER][i]) >> (2 * (16 - k))];
+                            _b = k_mer_counter_list[k - MIN_MER][i];
+                            (*result)[KmerSeq {k, MIN(_a, _b)}] += val;
                             k_mer_counter[k - MIN_MER][k_mer_counter_list[k - MIN_MER][i]] = 0;
                         }
                     }
                 } else {
                     for (auto& [key, value] : k_mer_counter_map[k - TABLE_MAX_MER - 1]) {
-                        (*result)[KmerSeq {k, MIN_128(key, get_rot_seq(reverse_complement(key >> (2 * (32 - k))), k))}] += value;
+                        _c = get_rot_seq(reverse_complement(key >> (2 * (32 - k))), k);
+                        (*result)[KmerSeq {k, MIN(key, _c)}] += value;
                     }
                     k_mer_counter_map[k - TABLE_MAX_MER - 1].clear();
                 }
@@ -914,6 +919,8 @@ void k_mer_128(const char* seq, int st, int nd, uint32_t** rot_table, const uint
     uint32_t estimated_count;
     uint128_t tmp;
     uint128_t val;
+    uint32_t _a, _b;
+    uint128_t _c;
 
     double target_frequency = 0;
     int target_k;
@@ -987,13 +994,16 @@ void k_mer_128(const char* seq, int st, int nd, uint32_t** rot_table, const uint
                     for (uint32_t i = 0; i < k_mer_data[k - MIN_MER][K_MER_DATA_COUNT]; i++) {
                         val = k_mer_counter[k - MIN_MER][k_mer_counter_list[k - MIN_MER][i]];
                         if (val > 0) {
-                            (*result)[KmerSeq {k, MIN_128(rot_table[k - MIN_MER][reverse_complement(k_mer_counter_list[k - MIN_MER][i]) >> (2 * (16 - k))], k_mer_counter_list[k - MIN_MER][i])}] += (uint32_t) val;
+                            _a = rot_table[k - MIN_MER][reverse_complement(k_mer_counter_list[k - MIN_MER][i]) >> (2 * (16 - k))];
+                            _b = k_mer_counter_list[k - MIN_MER][i];
+                            (*result)[KmerSeq {k, MIN(_a, _b)}] += (uint32_t) val;
                             k_mer_counter[k - MIN_MER][k_mer_counter_list[k - MIN_MER][i]] = 0;
                         }
                     }
                 } else {
                     for (auto& [key, value] : k_mer_counter_map[k - TABLE_MAX_MER - 1]) {
-                        (*result)[KmerSeq {k, MIN_128(key, get_rot_seq_128(reverse_complement_128(key) >> (2 * (64 - k)), k))}] += value;
+                        _c = get_rot_seq_128(reverse_complement_128(key) >> (2 * (64 - k)), k);
+                        (*result)[KmerSeq {k, MIN(key, _c)}] += value;
                     }
                     k_mer_counter_map[k - TABLE_MAX_MER - 1].clear();
                 }

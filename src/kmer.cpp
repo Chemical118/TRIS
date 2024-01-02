@@ -184,6 +184,7 @@ ResultMap* read_fastq(FILE* fp, ThreadData* thread_data, uint32_t** rot_table, u
             if ((num & 3) == 1) {
                 strcpy(buffer, buffer + idx + 1);
                 shift = bytes_read + shift - idx - 1;
+                idx = -1;
             } else {
                 shift = 0;
             }
@@ -193,7 +194,7 @@ ResultMap* read_fastq(FILE* fp, ThreadData* thread_data, uint32_t** rot_table, u
         CounterMap_128* k_mer_counter_map = new CounterMap_128[MAX_MER - TABLE_MAX_MER];
 
         while (1) {
-            bytes_read = (int) fread(buffer + shift, 1, LENGTH - 1 - shift, fp);
+            bytes_read = (int)fread(buffer + shift, 1, LENGTH - 1 - shift, fp);
             buffer[bytes_read + shift] = '\0';
 
             for (int i = 0; i < bytes_read + shift; i++) {
@@ -224,6 +225,7 @@ ResultMap* read_fastq(FILE* fp, ThreadData* thread_data, uint32_t** rot_table, u
             if ((num & 3) == 1) {
                 strcpy(buffer, buffer + idx + 1);
                 shift = bytes_read + shift - idx - 1;
+                idx = -1;
             } else {
                 shift = 0;
             }
@@ -251,7 +253,7 @@ void read_fastq_thread(FILE* fp, TBBQueue* buffer_task_queue) {
         bytes_read = (int)fread(buffer + shift, 1, LENGTH - 1 - shift, fp);
         buffer[bytes_read + shift] = '\0';
 
-        for(int i = 0; i < bytes_read + shift; i++) {
+        for (int i = 0; i < bytes_read + shift; i++) {
             if(buffer[i] == '\n') {
                 num += 1;
                 if((num & 3) == 2){
@@ -281,6 +283,7 @@ void read_fastq_thread(FILE* fp, TBBQueue* buffer_task_queue) {
         if ((num & 3) == 1) {
             strcpy(buffer_new, buffer + idx + 1);
             shift = bytes_read + shift - idx - 1;
+            idx = -1;
         }
         else {
             shift = 0;
@@ -317,7 +320,7 @@ ResultMap* read_fastq_gz(gzFile fp, ThreadData* thread_data, uint32_t** rot_tabl
             bytes_read = gzread(fp, buffer + shift, LENGTH - 1 - shift);
             buffer[bytes_read + shift] = '\0';
 
-            for(int i = 0; i < bytes_read + shift; i++) {
+            for (int i = 0; i < bytes_read + shift; i++) {
                 if(buffer[i] == '\n') {
                     num += 1;
                     if((num & 3) == 2){
@@ -346,6 +349,7 @@ ResultMap* read_fastq_gz(gzFile fp, ThreadData* thread_data, uint32_t** rot_tabl
             if ((num & 3) == 1) {
                 strcpy(buffer, buffer + idx + 1);
                 shift = bytes_read + shift - idx - 1;
+                idx = -1;
             }
             else {
                 shift = 0;
@@ -389,6 +393,7 @@ ResultMap* read_fastq_gz(gzFile fp, ThreadData* thread_data, uint32_t** rot_tabl
             if ((num & 3) == 1) {
                 strcpy(buffer, buffer + idx + 1);
                 shift = bytes_read + shift - idx - 1;
+                idx = -1;
             } else {
                 shift = 0;
             }
@@ -417,7 +422,7 @@ void read_fastq_gz_thread(gzFile fp, TBBQueue* buffer_task_queue) {
         bytes_read = gzread(fp, buffer + shift, LENGTH - 1 - shift);
         buffer[bytes_read + shift] = '\0';
 
-        for(int i = 0; i < bytes_read + shift; i++) {
+        for (int i = 0; i < bytes_read + shift; i++) {
             if(buffer[i] == '\n') {
                 num += 1;
                 if((num & 3) == 2){
@@ -447,6 +452,7 @@ void read_fastq_gz_thread(gzFile fp, TBBQueue* buffer_task_queue) {
         if ((num & 3) == 1) {
             strcpy(buffer_new, buffer + idx + 1);
             shift = bytes_read + shift - idx - 1;
+            idx = -1;
         }
         else {
             shift = 0;
@@ -528,6 +534,7 @@ void process_kmer(const char* file_name, uint8_t **repeat_check_table, uint32_t 
         }
         delete result_list[i];
     }
+    free(result_list);
 
     std::vector<std::pair<KmerSeq, uint32_t>> result_vector(result -> begin(), result -> end());
     delete result;
@@ -763,7 +770,7 @@ uint8_t get_repeat_check(uint128_t seq, int k) {
 }
 
 void int_to_four(char* buffer, uint128_t seq, int n) {
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         buffer[n - 1 - i] = trans_arr[(uint8_t) (seq & 0x3)];
         seq >>= 2;
     }
@@ -806,7 +813,7 @@ void k_mer(const char* seq, int st, int nd, uint32_t** rot_table, const uint64_t
         }
     }
 
-    for(int i = 1; i <= MAX_MER - MIN_MER; i++) {
+    for (int i = 1; i <= MAX_MER - MIN_MER; i++) {
         k_mer_total_cnt[i] = (int16_t)(k_mer_total_cnt[i] + k_mer_total_cnt[i - 1]);
     }
 
@@ -940,7 +947,7 @@ void k_mer_128(const char* seq, int st, int nd, uint32_t** rot_table, const uint
         }
     }
 
-    for(int i = 1; i <= MAX_MER - MIN_MER; i++) {
+    for (int i = 1; i <= MAX_MER - MIN_MER; i++) {
         k_mer_total_cnt[i] = (int16_t)(k_mer_total_cnt[i] + k_mer_total_cnt[i - 1]);
     }
 

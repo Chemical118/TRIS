@@ -6,10 +6,11 @@ int MAX_MER;
 int MIN_MER;
 int TABLE_MAX_MER;
 int NUM_THREAD;
+int QUEUE_SIZE;
 double BASELINE;
 
 int main(int argc, char** argv) {
-    argparse::ArgumentParser program("tris", "0.1.0");
+    argparse::ArgumentParser program("tris", "0.2.0");
 
     program.add_argument("MIN_MER")
             .help("minimum length of sequence to find telomere [MIN_MER >= " + std::to_string(ABS_MIN_MER) + "]")
@@ -37,6 +38,12 @@ int main(int argc, char** argv) {
             .scan<'d', int>()
             .metavar("TABLE_MAX_MER");
 
+    program.add_argument("-q", "--queue_size")
+            .help("size of buffer queue in MiB [QUEUE_SIZE >= 4, unlimited : -1]")
+            .default_value(-1)
+            .scan<'d', int>()
+            .metavar("QUEUE_SIZE");
+
     program.add_argument("-b", "--baseline")
             .help("BASELINE for repeat read [0.5 <= BASELINE <= 1]")
             .default_value(0.8)
@@ -50,6 +57,7 @@ int main(int argc, char** argv) {
         MAX_MER = program.get<int>("MAX_MER");
         NUM_THREAD = program.get<int>("--thread");
         TABLE_MAX_MER = program.get<int>("--table_max_mer");
+        QUEUE_SIZE = program.get<int>("--queue_size");
         BASELINE = program.get<double>("--baseline");
 
         // argument check
@@ -70,6 +78,11 @@ int main(int argc, char** argv) {
 
         if (TABLE_MAX_MER > ABS_TABLE_MAX_MER) {
             fprintf(stderr, "TABLE_MAX_MER must be less than or equal to %d.\n", ABS_TABLE_MAX_MER);
+            throw std::exception();
+        }
+
+        if (QUEUE_SIZE != -1 && QUEUE_SIZE < 4) {
+            fprintf(stderr, "QUEUE_SIZE must be -1 (unlimited) or greater than or equal to 4.\n");
             throw std::exception();
         }
 

@@ -35,6 +35,7 @@ extern int MIN_MER;
 extern int MAX_MER;
 extern int TABLE_MAX_MER;
 extern int NUM_THREAD;
+extern int QUEUE_SIZE;
 extern double BASELINE;
 
 typedef boost::multiprecision::uint128_t uint128_t;

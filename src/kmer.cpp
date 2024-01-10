@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
+#include <cinttypes>
 
 char trans_arr[4] = {'T', 'G', 'C', 'A'};
 #define O (-1)
@@ -268,8 +269,8 @@ void read_fastq_thread(FILE* fp, TBBQueue* buffer_task_queue) {
             }
         }
 
-        buffer_task_queue -> push(QueueData{buffer, loc_vector});
         if (bytes_read <= 0) {
+            buffer_task_queue -> push(QueueData{buffer, loc_vector});
             if (feof (fp)){
                 break;
             }
@@ -278,18 +279,20 @@ void read_fastq_thread(FILE* fp, TBBQueue* buffer_task_queue) {
                 exit(EXIT_FAILURE);
             }
         }
-
-        buffer_new = (char*)malloc(sizeof(char) * LENGTH);
-        if ((num & 3) == 1) {
-            strcpy(buffer_new, buffer + idx + 1);
-            shift = bytes_read + shift - idx - 1;
-            idx = -1;
-        }
         else {
-            shift = 0;
-        }
+            buffer_new = (char*)malloc(sizeof(char) * LENGTH);
+            if ((num & 3) == 1) {
+                strcpy(buffer_new, buffer + idx + 1);
+                shift = bytes_read + shift - idx - 1;
+                idx = -1;
+            }
+            else {
+                shift = 0;
+            }
 
-        buffer = buffer_new;
+            buffer_task_queue -> push(QueueData{buffer, loc_vector});
+            buffer = buffer_new;
+        }
     }
 }
 
@@ -437,8 +440,8 @@ void read_fastq_gz_thread(gzFile fp, TBBQueue* buffer_task_queue) {
             }
         }
 
-        buffer_task_queue -> push(QueueData{buffer, loc_vector});
         if (bytes_read < LENGTH - 1 - shift) {
+            buffer_task_queue -> push(QueueData{buffer, loc_vector});
             if (gzeof(fp)){
                 break;
             }
@@ -447,18 +450,19 @@ void read_fastq_gz_thread(gzFile fp, TBBQueue* buffer_task_queue) {
                 exit(EXIT_FAILURE);
             }
         }
-
-        buffer_new = (char*)malloc(sizeof(char) * LENGTH);
-        if ((num & 3) == 1) {
-            strcpy(buffer_new, buffer + idx + 1);
-            shift = bytes_read + shift - idx - 1;
-            idx = -1;
-        }
         else {
-            shift = 0;
+            buffer_new = (char*)malloc(sizeof(char) * LENGTH);
+            if ((num & 3) == 1) {
+                strcpy(buffer_new, buffer + idx + 1);
+                shift = bytes_read + shift - idx - 1;
+                idx = -1;
+            }
+            else {
+                shift = 0;
+            }
+            buffer_task_queue -> push(QueueData{buffer, loc_vector});
+            buffer = buffer_new;
         }
-
-        buffer = buffer_new;
     }
 }
 
@@ -469,6 +473,10 @@ void process_kmer(const char* file_name, uint8_t **repeat_check_table, uint32_t 
 
     TBBQueue buffer_task_queue {};
     TaskGroup tasks;
+
+    if (QUEUE_SIZE >= 4) {
+        buffer_task_queue.set_capacity(QUEUE_SIZE / 4);
+    }
 
     if (NUM_THREAD > 1) {
         for (int i = 0; i < NUM_THREAD - 1; i++) {
@@ -546,7 +554,7 @@ void process_kmer(const char* file_name, uint8_t **repeat_check_table, uint32_t 
     char buffer[ABS_MAX_MER + 1];
     for (auto& [k, v] : result_vector) {
         int_to_four(buffer, k.second, k.first);
-        fprintf(stdout, "%d,%s,%u\n", k.first, buffer, v);
+        fprintf(stdout, "%d,%s,%" PRIu32"\n", k.first, buffer, v);
     }
 }
 

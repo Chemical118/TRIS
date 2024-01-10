@@ -42,6 +42,7 @@ int MAX_MER;
 int MIN_MER;
 int TABLE_MAX_MER;
 int NUM_THREAD;
+int QUEUE_SIZE = -1;
 double BASELINE;
 
 // test function

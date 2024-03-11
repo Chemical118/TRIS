@@ -1,3 +1,6 @@
+# This repository is deprecated
+Please use updated tool [TREW](https://github.com/Chemical118/TREW)
+
 TRIS : Telomeric Repeat motif Identification tool with Short-read sequencing
 ================
 TRIS is tool that can identify Telomeric repeat motif (TRM) with short-read sequencing data. This tool looks for repeated sequences in a single read to find candidates for TRMs, iterating through them to finally find a TRM.
